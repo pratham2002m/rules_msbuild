@@ -1,0 +1,49 @@
+<Project>
+  <PropertyGroup>
+    <!--
+      These properties are used by the Sdk and it's imports and must be defined __before__ the sdk gets imported.
+      We could put some of these on the command line, but bazel doesn't allow us to get absolute paths in starlark
+      so we do them here and use the msbuild variable expansion.
+      -->
+    {pre_import_msbuild_properties}
+  </PropertyGroup>
+
+  <!--
+    Disable the default items because we are not in a normal project directory
+    Also, disable them because if bazel doesn't explicitly know about input files, MSBuild won't be able to access
+    these files in a sandbox.
+    https://aka.ms/sdkimplicititems
+    https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Sdk.DefaultItems.targets#L15
+  -->
+  <PropertyGroup>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+  </PropertyGroup>
+
+  <!--  https://docs.microsoft.com/en-us/dotnet/core/project-sdk/overview -->
+  {sdk_props}
+
+  <PropertyGroup>
+    {post_import_msbuild_properties}
+  </PropertyGroup>
+
+  <ItemGroup>
+    {compile_srcs}
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Projects/Assemblies -->
+    {references}
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Packages -->
+    {package_references}
+  </ItemGroup>
+
+  {sdk_targets}
+
+</Project>

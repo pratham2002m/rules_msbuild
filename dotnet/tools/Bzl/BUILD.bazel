@@ -1,0 +1,32 @@
+load("@rules_msbuild//dotnet:defs.bzl", "msbuild_binary")
+load("//:version.bzl", "VERSION")
+
+exports_files(["WORKSPACE.tpl"])
+
+msbuild_binary(
+    name = "Bzl",
+    srcs = [
+        "BuildReader.cs",
+        "Files.cs",
+        "Program.cs",
+        "Templates.cs",
+        "Util.cs",
+        "WorkspaceMaker.cs",
+    ],
+    data = [
+        "BUILD.root.tpl.bazel",
+        "WORKSPACE.tpl",
+        "//extras/ide",
+        "//tools:gazelle-dotnet",
+    ],
+    packable = True,
+    package_id = "SamHowes.Bzl",
+    target_framework = "net10.0",
+    version = VERSION,
+    visibility = ["//visibility:public"],
+    deps = [
+        "//dotnet/tools/NuGetParser",
+        "//dotnet/tools/Runfiles",
+        "@nuget//CommandLineParser",
+    ],
+)

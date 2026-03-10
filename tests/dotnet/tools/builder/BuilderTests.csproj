@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseAppHost>false</UseAppHost>
+    <TargetFramework>net10.0</TargetFramework>
+    <MSBuildPackageVersion>18.0.13</MSBuildPackageVersion>
+    <LangVersion>9.0</LangVersion>
+    <GenerateProgramFile Condition="$(BazelBuild) != ''">false</GenerateProgramFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Condition="$(BazelBuild) == ''" Remove="TestProgram.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="5.10.3"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1"/>
+    <PackageReference Include="Moq" Version="4.16.1"/>
+    <PackageReference Include="xunit.console" Version="2.4.1"/>
+    <PackageReference Include="xunit.extensibility.core" Version="2.4.1"/>
+    <PackageReference Include="xunit.assert" Version="2.4.1"/>
+    <PackageReference Include="xunit.core" Version="2.4.1"/>
+    <PackageReference Include="SamHowes.Microsoft.Build" Version="$(MSBuildPackageVersion)"/>
+    <PackageReference Include="SamHowes.Microsoft.Build.Framework" Version="$(MSBuildPackageVersion)"/>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="$(MSBuildPackageVersion)"/>
+    <!--  Make sure msbuild only copies this exact dll and no dependencies.  -->
+    <None Include="$(ExecRoot)/external//+nuget+nuget/packages/samhowes.microsoft.build/18.0.13/lib/net10.0/Microsoft.Build.dll" Condition="'$(TargetFramework)' == 'net10.0'">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="$(ExecRoot)/external//+nuget+nuget/packages/samhowes.microsoft.build.framework/18.0.13/lib/net10.0/Microsoft.Build.Framework.dll" Condition="'$(TargetFramework)' == 'net10.0'">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\dotnet\tools\builder\Builder.csproj"/>
+    <ProjectReference Include="..\..\..\..\dotnet\tools\Runfiles\Runfiles.csproj"/>
+  </ItemGroup>
+</Project>

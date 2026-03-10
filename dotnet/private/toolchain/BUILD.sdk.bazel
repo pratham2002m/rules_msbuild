@@ -1,0 +1,62 @@
+load("@rules_msbuild//dotnet/private/toolchain:dotnet_toolchain.bzl", "declare_toolchains")
+load("@rules_msbuild//dotnet/private/rules:sdk.bzl", "dotnet_config", "dotnet_sdk")
+load("@rules_msbuild//dotnet/private/rules:msbuild.bzl", "msbuild_tool_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+# https://docs.microsoft.com/en-us/dotnet/core/distribution-packaging
+
+declare_toolchains(
+    builder = ":builder",
+    host = "{dotnetos}_{dotnetarch}",
+    sdk = ":dotnet_sdk",
+)
+
+exports_files([
+    "Directory.Bazel.props",
+    "Directory.Bazel.targets",
+])
+
+dotnet_sdk(
+    name = "dotnet_sdk",
+    bazel_props = ":Directory.Bazel.props",
+    config = ":dotnet_config",
+    dotnet = ":dotnet",
+    dotnetarch = "{dotnetarch}",
+    dotnetos = "{dotnetos}",
+    fxr = ":fxr",
+    home_dir = ".dotnet",
+    major_version = {major_version},
+    packs = "packs",
+    root_file = "ROOT",
+    sdk_root = "sdk/{version}",
+    shared = "shared",
+)
+
+dotnet_config(
+    name = "dotnet_config",
+    nuget_config = "{nuget_config}",
+    test_logger = "{nuget_repo}//:test_logger",
+    tfm_mapping = "{tfm_mapping}",
+    trim_path = "{trim_path}",
+)
+
+msbuild_tool_binary(
+    name = "builder",
+    srcs = ["@rules_msbuild//dotnet/tools/builder:builder_srcs"],
+    dotnet_sdk = ":dotnet_sdk",
+    target_framework = "{builder_tfm}",
+    project_file = "@rules_msbuild//dotnet/tools/builder:Builder.csproj",
+    deps = [
+        "{builder_deps}"
+    ],
+    bazel_packages = "@nuget//:bazel_packages",
+)
+
+filegroup(
+    name = "fxr",
+    srcs = glob(["host/fxr/**/*"]),  # not multi-version safe
+)
+
+# not multi-version safe
+{dynamics}

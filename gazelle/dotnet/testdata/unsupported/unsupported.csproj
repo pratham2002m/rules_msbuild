@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk" foo="">
+
+  <PropertyGroup Condition="">
+    <TargetFramework Condition="">net10.0</TargetFramework>
+    <Foo Condition="">Bar</Foo>
+  </PropertyGroup>
+
+  <ItemGroup Condition="">
+    <Unkown />
+    <Content Foo="foo.txt"/>
+    <Content Include="foo.txt">
+      <CopyToOutputDirectory>always</CopyToOutputDirectory>
+    </Content>
+    <Content Remove="$(CustomDir)**"/>
+    <None Remove="$(CustomDir)**"/>
+    <Compile Include="foo.bar" Condition=""/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="foo.csproj"/>
+    <PackageReference Include="bar" Version="4">
+      <PrivateAssetts>all</PrivateAssetts>
+    </PackageReference>
+  </ItemGroup>
+  <Target></Target>
+</Project>

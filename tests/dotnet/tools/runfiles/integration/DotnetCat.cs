@@ -1,0 +1,18 @@
+﻿using System;
+using System.IO;
+using RulesMSBuild.Tools.Bazel;
+
+namespace RulesMSBuild.Tools.RunfilesTests
+{
+    public class DotnetCat
+    {
+        static void Main(string[] args)
+        {
+            var r = Runfiles.Create();
+            var contents =
+                File.ReadAllText(r.Rlocation("_main/tests/dotnet/tools/runfiles/integration/foo.txt"));
+
+            Console.Write(contents);
+        }
+    }
+}

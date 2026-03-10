@@ -1,0 +1,32 @@
+load("//tests/tools/build_test:build_test.bzl", "build_test")
+load("@rules_msbuild//dotnet:defs.bzl", "msbuild_binary")
+
+msbuild_binary(
+    name = "Consumer",
+    srcs = ["Program.cs"],
+    content = [
+        "foo.txt",
+    ],
+    msbuild_directory = "//tests/examples/DirectoryProps:msbuild_defaults",
+    target_framework = "net10.0",
+    visibility = ["//visibility:public"],
+)
+
+build_test(
+    name = "Consumer_test",
+    expected_files = {
+        "net10.0": [
+            "foo.txt",
+            "Foo.DirectoryProps.Consumer.dll",
+        ],
+    },
+)
+
+build_test(
+    name = "Consumer_publish_test",
+    expected_files = {
+        "publish/net10.0": [
+            "foo.txt",
+        ],
+    },
+)

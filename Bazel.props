@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup>
+        <BazelWorkspaceName>rules_msbuild</BazelWorkspaceName>
+        <BazelWorkspacePath>$(MSBuildThisFileDirectory)</BazelWorkspacePath>
+    </PropertyGroup>
+</Project>

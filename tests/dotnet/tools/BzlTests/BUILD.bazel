@@ -1,0 +1,19 @@
+load("@rules_msbuild//dotnet:defs.bzl", "msbuild_test")
+
+# gazelle:exclude testdata
+
+msbuild_test(
+    name = "BzlTests",
+    size = "small",
+    srcs = ["WorkspaceMakerTests.cs"],
+    data = glob(["testdata/**"]) + ["WORKSPACE.FAKE.tpl"],
+    target_framework = "net10.0",
+    deps = [
+        "//dotnet/tools/Bzl",
+        "//dotnet/tools/Runfiles",
+        "@nuget//FluentAssertions",
+        "@nuget//Microsoft.NET.Test.Sdk",
+        "@nuget//xunit",
+        "@nuget//xunit.runner.visualstudio",
+    ],
+)

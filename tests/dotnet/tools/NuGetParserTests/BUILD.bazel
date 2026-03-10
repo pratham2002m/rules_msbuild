@@ -1,0 +1,21 @@
+load("@rules_msbuild//dotnet:defs.bzl", "msbuild_test")
+
+msbuild_test(
+    name = "NuGetParserTests",
+    size = "small",
+    srcs = [
+        "AssetsReaderTests.cs",
+        "ParserTests.cs",
+    ],
+    content = ["project.assets.json"],
+    target_framework = "net10.0",
+    deps = [
+        "//dotnet/tools/NuGetParser",
+        "@nuget//FluentAssertions",
+        "@nuget//Microsoft.NET.Test.Sdk",
+        "@nuget//Moq",
+        "@nuget//coverlet.collector",
+        "@nuget//xunit",
+        "@nuget//xunit.runner.visualstudio",
+    ],
+)

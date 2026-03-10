@@ -1,0 +1,20 @@
+load("@rules_msbuild//dotnet:defs.bzl", "msbuild_binary")
+
+msbuild_binary(
+    name = "TestRunner",
+    srcs = [
+        "BazelRunner.cs",
+        "PosixPath.cs",
+        "Program.cs",
+        "TestLogger.cs",
+        "TestRunner.cs",
+    ],
+    project_file = "TestRunner.csproj",
+    target_framework = "net10.0",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//dotnet/tools/Bzl",
+        "//dotnet/tools/Runfiles",
+        "//dotnet/tools/builder:Builder",
+    ],
+)

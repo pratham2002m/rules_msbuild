@@ -1,0 +1,31 @@
+load("//tests/tools/build_test:build_test.bzl", "build_test")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_msbuild//dotnet:defs.bzl", "msbuild_library")
+
+# gazelle:go_generate_proto false
+proto_library(
+    name = "greet_proto",
+    srcs = [
+        "greet.proto",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+msbuild_library(
+    name = "Protos.Net",
+    srcs = [],
+    project_file = "Protos.csproj",
+    protos = [":greet_proto"],
+    target_framework = "net10.0",
+    visibility = ["//visibility:public"],
+    deps = ["@nuget//Grpc.AspNetCore"],
+)
+
+build_test(
+    name = "Protos.Net_test",
+    expected_files = {
+        "net10.0": [
+            "Protos.Net.dll",
+        ],
+    },
+)

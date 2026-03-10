@@ -1,0 +1,23 @@
+load("@rules_msbuild//dotnet:defs.bzl", "msbuild_library")
+
+# gazelle-err: unsupported project attribute: foo
+# gazelle-err: unsupported project element: Target
+# gazelle-err: unsupported property group attribute: Condition
+# gazelle-err: unsupported property attribute: Condition
+# gazelle-err: unsupported item group attribute: Condition
+# gazelle-err: unsupported item group element: Unkown
+msbuild_library(
+    name = "unsupported",
+    srcs = glob(["*.cs"]) + ["foo.bar"],
+    content = [
+        # gazelle-err: unsupported Content attribute: Foo
+        # gazelle-err: unsupported Content element: CopyToOutputDirectory
+        "foo.txt",
+    ],
+    target_framework = "net10.0",
+    visibility = ["//visibility:public"],
+    deps = [
+        # gazelle-err: could not find project file at //:foo.csproj
+        "@nuget//bar",
+    ],
+)

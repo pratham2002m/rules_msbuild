@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>bzl</ToolCommandName>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <Authors>Sam Howes</Authors>
+        <PackageId>SamHowes.Bzl</PackageId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="../NuGetParser/NuGetParser.csproj" />
+      <ProjectReference Include="../Runfiles/Runfiles.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    </ItemGroup>
+
+</Project>

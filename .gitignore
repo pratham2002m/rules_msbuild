@@ -1,0 +1,16 @@
+bazel-*
+bin
+obj
+*.user
+.vs
+.ijwb
+.clwb
+.bazelrc.user
+.vscode/c_cpp_properties.json
+.idea
+tmp
+*-bin
+*.bazelrc
+external/
+
+commitmessage.txt
