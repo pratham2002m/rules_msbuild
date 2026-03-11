@@ -210,21 +210,21 @@ namespace RulesMSBuild.Tools.Builder
             var useAppHost = project.GetPropertyValue("UseAppHost");
             var runtimeIdentifier = project.GetPropertyValue("RuntimeIdentifier");
             var publishSingleFile = project.GetPropertyValue("PublishSingleFile");
-            
+
             Debug($"Project SelfContained: {selfContained}");
             Debug($"Project UseAppHost: {useAppHost}");
             Debug($"Project RuntimeIdentifier: {runtimeIdentifier}");
             Debug($"Project PublishSingleFile: {publishSingleFile}");
             Debug($"Assembly name: {_context.Command.assembly_name}");
             Debug($"Output path: {_context.MSBuild.OutputPath}");
-            
+
             // Warn if potentially problematic settings are detected
             if (selfContained?.ToLower() == "true" || useAppHost?.ToLower() == "true" || !string.IsNullOrEmpty(runtimeIdentifier))
             {
                 Debug($"WARNING: Self-contained deployment settings detected - this may cause 'output was not created' errors");
                 Debug($"WARNING: Expected output location: {_context.MSBuild.OutputPath}");
             }
-            
+
             // Bazel marks output files as read-only after a successful build. On a subsequent build,
             // MSBuild will fail trying to overwrite them (MSB3021 "Access denied"). Strip read-only
             // from output and obj directories before MSBuild runs.
@@ -504,14 +504,14 @@ namespace RulesMSBuild.Tools.Builder
 
         /// <summary>
         /// Handle self-contained deployments that output assemblies to runtime-specific subdirectories.
-        /// When SelfContained=true, MSBuild creates outputs in win-x64/, linux-x64/, etc. but Bazel 
-        /// expects them directly in the TFM directory (net10.0/). This method checks for runtime 
+        /// When SelfContained=true, MSBuild creates outputs in win-x64/, linux-x64/, etc. but Bazel
+        /// expects them directly in the TFM directory (net10.0/). This method checks for runtime
         /// subdirectories and copies the outputs to the expected location.
         /// </summary>
         private void HandleSelfContainedOutputs(string tfmPath)
         {
             Debug($"HandleSelfContainedOutputs: checking tfmPath={tfmPath}");
-            
+
             if (!Directory.Exists(tfmPath))
             {
                 Debug($"HandleSelfContainedOutputs: tfmPath does not exist");
@@ -538,14 +538,14 @@ namespace RulesMSBuild.Tools.Builder
             // Look for runtime-specific subdirectories (win-x64, linux-x64, etc.)
             var allDirs = Directory.GetDirectories(tfmPath);
             Debug($"HandleSelfContainedOutputs: found {allDirs.Length} subdirectories: {string.Join(", ", allDirs.Select(Path.GetFileName))}");
-            
+
             var runtimeDirs = allDirs
-                .Where(dir => 
+                .Where(dir =>
                 {
                     var dirName = Path.GetFileName(dir);
                     return dirName.Contains("-") && // Runtime identifiers contain dashes
-                           (dirName.StartsWith("win-") || dirName.StartsWith("linux-") || 
-                            dirName.StartsWith("osx-") || dirName.Contains("x64") || 
+                           (dirName.StartsWith("win-") || dirName.StartsWith("linux-") ||
+                            dirName.StartsWith("osx-") || dirName.Contains("x64") ||
                             dirName.Contains("arm"));
                 });
 
@@ -579,7 +579,7 @@ namespace RulesMSBuild.Tools.Builder
 
                 // Copy other essential files (deps.json, runtimeconfig.json, etc.)
                 var runtimeFiles = Directory.GetFiles(runtimeDir, $"{assemblyName}.*")
-                    .Where(f => 
+                    .Where(f =>
                     {
                         var ext = Path.GetExtension(f).ToLower();
                         return ext == ".deps.json" || ext == ".runtimeconfig.json" || ext == ".pdb";
@@ -587,7 +587,7 @@ namespace RulesMSBuild.Tools.Builder
 
                 foreach (var runtimeFile in runtimeFiles)
                 {
-                    var fileName = Path.GetFileName(runtimeFile);  
+                    var fileName = Path.GetFileName(runtimeFile);
                     var targetFile = Path.Combine(tfmPath, fileName);
                     if (!File.Exists(targetFile))
                     {
@@ -671,9 +671,20 @@ namespace RulesMSBuild.Tools.Builder
             if (!Directory.Exists(path)) return;
             foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
             {
-                var attrs = File.GetAttributes(file);
-                if ((attrs & FileAttributes.ReadOnly) != 0)
-                    File.SetAttributes(file, attrs & ~FileAttributes.ReadOnly);
+                try
+                {
+                    var attrs = File.GetAttributes(file);
+                    if ((attrs & FileAttributes.ReadOnly) != 0)
+                        File.SetAttributes(file, attrs & ~FileAttributes.ReadOnly);
+                }
+                catch (IOException)
+                {
+                    // The file may be on a read-only bind-mount (Linux sandbox): nothing to do.
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // Best-effort: skip files we cannot modify.
+                }
             }
         }
 

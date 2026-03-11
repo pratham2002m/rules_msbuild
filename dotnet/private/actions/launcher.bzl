@@ -60,7 +60,7 @@ def make_launcher(ctx, dotnet, info):
     if is_bin_launcher:
         args = ctx.actions.args()
         args.add_all([
-            dotnet.builder.assembly,
+            dotnet.builder.exe_path,
             "launcher",
             launcher_template,
             launcher,

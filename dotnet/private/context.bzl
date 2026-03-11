@@ -137,7 +137,7 @@ def make_builder_cmd(ctx, dotnet, action, directory_info, assembly_name):
     workspace = ctx.label.workspace_name
     args = ctx.actions.args()
     args.add_all([
-        dotnet.builder.assembly.path,
+        dotnet.builder.exe_path,
         action,
         "--sdk_root",
         dotnet.sdk.sdk_root.path,
