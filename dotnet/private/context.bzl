@@ -49,7 +49,9 @@ def dotnet_exec_context(ctx, is_executable, is_test = False, target_framework = 
     tfm = getattr(ctx.attr, "target_framework", target_framework)
     tfm_info = sdk.config.tfm_mapping.get(tfm, None)
     if tfm_info == None:
-        fail("Tfm {} was not configured for restore by nuget. If this was not a mistake, please add it to your ".format(tfm) +
+        print(tfm)
+        print(sdk.config.tfm_mapping)
+        fail("target_framework {} was not configured for restore by nuget. If this was not a mistake, please add it to your ".format(tfm) +
              "nuget_fetch rule.")
 
     mode = ctx.var["COMPILATION_MODE"]
@@ -86,10 +88,6 @@ def dotnet_exec_context(ctx, is_executable, is_test = False, target_framework = 
 
 def dotnet_context(sdk_root, os, builder = None, sdk = None, **kwargs):
     ext = ".exe" if os == "windows" else ""
-
-
-    print("Dotnet sdk_root is {}".format(sdk_root))
-
     return struct(
         sdk_root = sdk_root,
         os = os,
@@ -113,9 +111,18 @@ def _make_env(dotnet_sdk_root, os):
         "DOTNET_NOLOGO": "1",
         # "NUGET_SHOW_STACK": "true",
         # "BUILDER_DEBUG": "1",
-        "OS": "Windows_NT", # https://github.com/dotnet/aspnetcore/issues/27990
         "RULES_MSBUILD_VERSION": VERSION,
     }
+
+    # https://github.com/dotnet/aspnetcore/issues/27990
+    if os == "windows":
+        env["OS"] = "Windows_NT"
+    elif os == "linux":
+        env["OS"] = "Linux"
+    elif os == "darwin":
+        env["OS"] = "Darwin"
+    else:
+        fail("Unsupported OS: {}".format(os))
 
     if os not in NUGET_ENVIRONMENTS:
         fail("No nuget environment configuration for os {}".format(os))
